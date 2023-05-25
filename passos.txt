@@ -1,0 +1,83 @@
+1 - criar o app
+ionic start MapsApp3 blank --type=angular
+
+2 - instalar capacitor
+npm install @capacitor/google-maps
+npx cap sync ou ionic cap sync
+
+3 - modificar home.page.css
+capacitor-google-map {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
+
+4 - adicionar key do google maps no environment.prod e environment.ts
+export const environment = {
+  production: true,
+  mapsKey: 'AIzaSyD6v5fULYIQf3DgoRdHRxCahyUMBJSYyjc'
+};
+
+export const environment = {
+  production: false,
+  mapsKey: 'AIzaSyD6v5fULYIQf3DgoRdHRxCahyUMBJSYyjc'
+};
+
+5 - fazer a importação do custon elements no home.module.ts
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+abaixo do @NgModule
+schemas: [CUSTOM_ELEMENTS_SCHEMA],
+
+6 - alterar home.page.html
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Google Maps
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <capacitor-google-map #map></capacitor-google-map>
+
+</ion-content>
+
+7 - criar metodo para gerar o maps
+
+import { environment } from './../../environments/environment';
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { GoogleMap } from '@capacitor/google-maps';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: 'home.page.html',
+  styleUrls: ['home.page.scss'],
+})
+export class HomePage {
+
+  @ViewChild('map') mapRef!: ElementRef<HTMLElement>;
+  newMap!: GoogleMap;
+
+  constructor() {}
+
+  ionViewWillEnter() {
+    this.createMap();
+  }
+
+  async createMap() {
+    this.newMap = await GoogleMap.create({
+      id: 'my-map',
+      element: this.mapRef.nativeElement,
+      apiKey: environment.mapsKey,
+      config: {
+        center: {
+          lat: 33.6,
+          lng: -117.9,
+        },
+        zoom: 8,
+      },
+    });
+  }
+
+}
+
